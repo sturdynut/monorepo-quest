@@ -1,3 +1,6 @@
 {
-  "name": "monorepo-quest"
+  "name": "monorepo-quest",
+  "devDependencies": {
+    "lerna": "^3.17.0"
+  }
 }
