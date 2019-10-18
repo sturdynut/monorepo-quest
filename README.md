@@ -22,6 +22,8 @@ This repo is a step-by-step tutorial to setup a monorepo using Lerna and Yarn Wo
 
 ## Helpful Information
 
+* Each step below starts as if you are at the root of your project.
+
 **Branches**
 
 This step-by-step tutorial starts from scratch, but captures each step in a branch in case you get lost or want to skip forward.
@@ -140,4 +142,99 @@ At this point, you have a monorepo ready to go.  The next steps present a fairly
 
 ---
 
-_more coming soon..._
+## Step 3: Setup React App (client)
+
+> If you did not complete the previous step or want to start fresh: 📟 `git checkout steps/2`.
+
+We are going to scaffold out a React app using a tool called [create-react-app](https://github.com/facebook/create-react-app).  This was built by facebook to provide a standardized way to quickly setup a React app.  One of the main advantages is that it shields you from all the configuration that goes along with setting up a React app from scratch.
+
+1. 📟 `rm -rf ./packages/client`
+    * This kills off the existing client folder
+2. 📟 `npx create-react-app --scripts-version @react-workspaces/react-scripts ./packages/client`
+    * This will scaffold out a react app using [create-react-app](https://github.com/facebook/create-react-app) and a custom version of [react-scripts](https://github.com/react-workspaces/react-workspaces-playground) that adds support for Yarn Workspaces to Create React App.
+3. 📟 `rm -f yarn.lock && rm -f ./packages/client/yarn.lock`
+    * This kills off any existing lock files that could potentially conflict with our top level lock file
+4. 📟 `rm -rf ./packages/client/node_modules`
+    * This kills off the `node_modules` folder in the client package because we want to load them from the root after we run the subsequent command to bootstrap our monorepo.
+5. 📟 `lerna bootstrap`
+    * Installs react app dependencies in top level `node_modules`
+6. 📟 `cd ./packages/client && yarn start`
+
+You should now have a React app running at this URL:
+[http://localhost:3000](http://localhost:3000)
+
+---
+
+## Step 4: Setup GraphQL Server (server)
+
+> If you did not complete the previous step or want to start fresh: 📟 `git checkout steps/3`.
+
+We will be setting up our server using [GraphQL](https://graphql.org/), which in short is a query language for APIs and a runtime for fulfilling those queries with your existing data.
+
+Similar to how we scaffolded out a React app, there are tools out there that make it easy to setup a GraphQL server vs building one from scratch.  We will be using a tool called [GraphQL Yoga](graphql-yoga), which is one of the most popular options with over 5k stars on GitHub.
+
+1. 📟 `lerna add graphql-yoga --scope=server`
+   * You should now see `graphql-yoga` in your `server` packages `package.json` file
+2  ✏️ Add the following to `packages/server/index.js`:
+
+    ```
+    import { GraphQLServer } from 'graphql-yoga';
+
+    const typeDefs = `
+      type Query {
+        hello(name: String): String!
+      }
+    `;
+
+    const resolvers = {
+      Query: {
+        hello: (_, { name }) => `Hello ${name || 'World'}`,
+      },
+    };
+
+    const server = new GraphQLServer({ typeDefs, resolvers });
+
+    server.start(() => console.log('Server is running on localhost:4000'));
+
+    ```
+
+3. 📟 `lerna add nodemon --scope=server --dev`
+4. 📟 `lerna add esm --scope=server`
+5. 📟 `lerna bootstrap`
+6. 📟 `cd ./packages/server`
+7. 📟 `npx nodemon -r esm ./`
+
+You should now have a GraphQL server running at this URL:
+[http://localhost:4000](http://localhost:4000)
+
+### 🌈 Our First Query
+
+Let's open up our GraphQL server by going to [http://localhost:4000](http://localhost:4000) in web browser.
+
+You will notice that there is some cool looking tool there.  That is called GraphiQL, a tool that allows you to query your GraphQL server.
+
+In the left pane, you'll want to enter the following:
+
+```
+query hello($name: String) {
+  hello(name: $name)
+}
+```
+
+Next, we will need to provide our query with values for `name`.  Click the "QUERY VARIABLES" link at the bottom left and enter the following:
+
+```
+{
+  "name": "Human"
+}
+```
+
+Click the play button and you should see something like this:
+
+```
+{
+  "data": {
+    "hello": "Hello Human"
+  }
+}
+```

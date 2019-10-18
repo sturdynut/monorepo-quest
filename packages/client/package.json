@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "common": "^1.0.0"
+    "common": "^1.0.0",
+    "ramda": "^0.26.1"
   }
 }

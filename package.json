@@ -2,5 +2,9 @@
   "name": "monorepo-quest",
   "devDependencies": {
     "lerna": "^3.17.0"
-  }
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
 }
