@@ -5,6 +5,11 @@
   "license": "MIT",
   "dependencies": {
     "common": "^1.0.0",
+    "esm": "^3.2.25",
+    "graphql-yoga": "^1.18.3",
     "ramda": "^0.26.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
   }
 }
